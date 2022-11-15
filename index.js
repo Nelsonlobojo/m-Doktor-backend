@@ -54,13 +54,13 @@ mongoose.connect( process.env.DB_CONNECT, {
     .then(() => console.log('Connected to database'))
     .catch((err) => console.log(err)); 
 
-// Server - development
-app.listen(3000, () => {
-    console.log('Server is running http://localhost:3000');
-});
+// // Server - development
+// app.listen(3000, () => {
+//     console.log('Server is running http://localhost:3000');
+// });
 
 // // Server - production
-// var server = app.listen(process.env.PORT || 3000, function () {
-//     var port = server.address().port;
-//     console.log("Express is working on port " + port);
-// });
+var server = app.listen(process.env.PORT || 3000, function () {
+    var port = server.address().port;
+    console.log("Express is working on port " + port);
+});
