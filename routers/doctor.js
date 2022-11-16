@@ -55,9 +55,7 @@ router.get(`/:id`, async (req, res) => {
 });
 
 router.post(`/`, uploadOptions.single('profilePicture') , async (req, res) => {
-    const speciality = await Speciality.findById(req.body.speciality);
-    if(!speciality) return res.status(400).send('Invalid Speciality');
-
+   
     const file = req.file;
     if(!file) return res.status(400).send('No image in the request');
 
@@ -69,12 +67,7 @@ router.post(`/`, uploadOptions.single('profilePicture') , async (req, res) => {
         email: req.body.email,
         passwordHash: bcrypt.hashSync(req.body.password, 10),
         phone: req.body.phone,
-        speciality: req.body.speciality,
         medicalLicenseNumber: req.body.medicalLicenseNumber,
-        bio: req.body.bio,
-        profilePicture: `${basePath}${fileName}`,
-        price: req.body.price,
-        isVerified: req.body.isVerified,
     });
 
     doctor = await doctor.save();
@@ -85,20 +78,13 @@ router.post(`/`, uploadOptions.single('profilePicture') , async (req, res) => {
 });
 
 router.post(`/register`, async (req, res) => {
-    const speciality = await Speciality.findById(req.body.speciality);
-    if(!speciality) return res.status(400).send('Invalid Speciality');
-
+   
     const doctor = new Doctor({
         name: req.body.name,
         email: req.body.email,
         passwordHash: bcrypt.hashSync(req.body.password, 10),
         phone: req.body.phone,
-        speciality: req.body.speciality,
         medicalLicenseNumber: req.body.medicalLicenseNumber,
-        bio: req.body.bio,
-        profilePicture: req.body.profilePicture,
-        price: req.body.price,
-        isVerified: req.body.isVerified,
     });
 
     doctor = await doctor.save();

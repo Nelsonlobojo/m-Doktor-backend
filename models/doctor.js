@@ -13,14 +13,15 @@ const doctorSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    password: {
+    passwordHash: {
         type: String,
         required: true
     },
     speciality: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Speciality',
-        required: true
+        required: true,
+        default: null
     },
     medicalLicenseNumber: {
         type: String,
@@ -38,7 +39,8 @@ const doctorSchema = new mongoose.Schema({
     },
     price: {
         type: Number,
-        required: true
+        required: true,
+        default: 200
     },
     isVerified: {
         type: Boolean,
