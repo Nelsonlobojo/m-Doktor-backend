@@ -11,18 +11,17 @@ function authJwt () {
         path: [
             `${api}/users/login`,
             `${api}/users/register`,
-            `${api}/doctors/login`,
+            `${api}/doctors/`,
             `${api}/doctors/register`,
-            
+            `${api}/doctors/login`,
+            `${api}/appointments/`,
+            `${api}/users/`,
+
         ]
-    })
+    });
 }
 
 async function isRevoked(req, payload, done) {
-    if(!payload.isAdmin){
-        done(null, true)
-    }
-
     done();
 }
 

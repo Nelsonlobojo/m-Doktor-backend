@@ -1,17 +1,11 @@
-const {Appointment} = require('../models/appointments');
+const Appointment = require('../models/appointments');
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 
 router.get(`/`, async (req, res) => {
     
-    const appointmentList = await Appointment.find(filter).populate('user doctor type ');
-    const userAppointmentList = await Appointment.find().populate('user', 'name phone email profilePicture').sort({'date': 1});
-
-    if(!appointmentList) {
-        res.status(500).json({success: false})
-    } 
-    res.status(200).send(appointmentList);
+    let userAppointmentList = await Appointment.find().populate(["doctor","user"]).sort({'date': 1});
 
     if(!userAppointmentList) {
         res.status(500).json({success: false})
@@ -20,7 +14,7 @@ router.get(`/`, async (req, res) => {
 })
 
 router.get(`/:id`, async (req, res) => {
-    const appointment = await Appointment.findById(req.params.id).populate('user doctor type');
+    let appointment = await Appointment.findById(req.params.id).populate('user doctor');
 
     if(!appointment) {
         res.status(500).json({success: false})
@@ -31,10 +25,10 @@ router.get(`/:id`, async (req, res) => {
 router.post(`/`, async (req, res) => {
 
     let appointment = new Appointment({
+        user: req.body.user,
         doctor: req.body.doctor,
         date: req.body.date,
         time: req.body.time,
-        type: req.body.type,
     })
     appointment = await appointment.save();
 
@@ -51,7 +45,6 @@ router.put('/:id', async (req, res) => {
         {
             date: req.body.date,
             time: req.body.time,
-            type: req.body.type,
         },
         {new: true}
     )
@@ -86,20 +79,9 @@ router.get(`/get/count`,async (req, res) => {
 });
 
 router.get(`/userappointments/:userid`, async (req, res) => {
-    let filter = {};
-    if(req.query.categories){
-        filter = {category: req.query.categories.split(',')}
-    }
-    const appointmentList = await Appointment.find(filter).populate('user doctor type');
-    const userAppointmentList = await Appointment.find({user: req.params.userid}).
-    populate({path:'doctor', populate:{
-        path:'speciality',
-    }}).sort({'date': 1});
+    let userAppointmentList = await Appointment.find({user: req.params.userid}).
+    populate(["doctor","user"]).sort({'date': 1});
 
-    if(!appointmentList) {
-        res.status(500).json({success: false})
-    } 
-    res.status(200).send(appointmentList);
 
     if(!userAppointmentList) {
         res.status(500).json({success: false})

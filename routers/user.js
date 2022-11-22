@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { User } = require('../models/user');
+const User  = require('../models/user');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -32,7 +32,7 @@ const storage = multer.diskStorage({
 const uploadOptions = multer({storage: storage});
 
 router.get(`/`,async (req, res) => {
-    const userList = await User.find().select('name phone email profilePicture');
+    let userList = await User.find().select();
 
     if(!userList) {
         res.status(500).json({success: false})
@@ -41,7 +41,7 @@ router.get(`/`,async (req, res) => {
 });
 
 router.get(`/:id`, async (req, res) => {
-    const user = await User.findById(req.params.id).select('name profilePicture phone email');
+    let user = await User.findById(req.params.id).select();
     if(!user) {
         res.status(500).json({success: false})
     }
@@ -56,7 +56,7 @@ router.post(`/`, uploadOptions.single('profilePicture'), async (req, res) => {
     const fileName = req.file.filename;
     const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
 
-    const user = new User({
+    let user = new User({
         name: req.body.name,
         phone: req.body.phone,
         email: req.body.email,
@@ -72,7 +72,7 @@ router.post(`/`, uploadOptions.single('profilePicture'), async (req, res) => {
 });
 
 router.post(`/register`, async (req, res) => {
-    const user = new User({
+    let user = new User({
         name: req.body.name,
         phone: req.body.phone,
         email: req.body.email,
@@ -81,14 +81,14 @@ router.post(`/register`, async (req, res) => {
     });
 
     user = await user.save();
-    if(!patient)
+    if(!user)
     return res.status(500).send('the user cannot be registered!');
 
     res.send(user);
 });
 
 router.post(`/login`,async (req, res) => {
-    const user = await User.findOne({email: req.body.email});
+    let user = await User.findOne({email: req.body.email});
     const secret = process.env.secret;
     if(!user){
         return res.status(400).send('the user not found');
@@ -107,6 +107,30 @@ router.post(`/login`,async (req, res) => {
     else{
         res.status(400).send('password is wrong');
     }
+});
+
+router.put(`/:id`, async (req, res) => {
+
+    if(!mongoose.isValidObjectId(req.params.id)){
+        res.status(400).send('Invalid User Id');
+    }
+
+    let user = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+            name: req.body.name,
+            phone: req.body.phone,
+            email: req.body.email,
+            //profilePicture: req.body.profilePicture,
+        },
+        {new: true}
+    )
+
+    if(!user)
+    return res.status(500).send('the user cannot be updated!');
+
+    res.send(user);
+
 });
 
 router.get(`/get/count`,async (req, res) => {

@@ -2,7 +2,6 @@ const {NewsItem} = require('../models/newsitem');
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-const {Specialty} = require('../models/speciality');
 
 router.get('/', async (req, res) => {
     const newsItems = await NewsItem.find().sort('date');
@@ -21,14 +20,10 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-    const specialty = await Specialty.findById(req.body.specialty);
-    if(!specialty) return res.status(400).send('Invalid Specialty');
-
     let newsItem = new NewsItem({
         title: req.body.title,
         content: req.body.content,
         date: req.body.date,
-        specialty: req.body.category
     });
     newsItem = await newsItem.save();
 
@@ -42,9 +37,6 @@ router.put('/:id', async (req, res) => {
     if(!mongoose.isValidObjectId(req.params.id)) {
         res.status(400).send('Invalid NewsItem Id');
     }
-    const specialty = await Specialty.findById(req.body.specialty);
-    if(!specialty) return res.status(400).send('Invalid Specialty');
-
     const newsItem = await NewsItem.findByIdAndUpdate(
         req.params.id,
         {

@@ -17,34 +17,18 @@ const doctorSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    speciality: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Speciality',
-        required: true,
-        default: null
-    },
-    medicalLicenseNumber: {
-        type: String,
-        required: true
-    },
     bio: {
         type: String,
-        default: '',
         required: true
     },
     profilePicture: {
         type: String,
-        default: '',
-        required: true
+        default: 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png'
     },
     price: {
         type: Number,
         required: true,
-        default: 200
-    },
-    isVerified: {
-        type: Boolean,
-        default: false
+
     }
 });
 

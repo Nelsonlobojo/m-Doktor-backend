@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { Doctor } = require('../models/doctor');
+const Doctor  = require('../models/doctor');
 const mongoose = require('mongoose');
-const { Speciality} = require('../models/speciality');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
@@ -14,7 +13,7 @@ const FILE_TYPE_MAP = {
 };
 
 // Multer Config
-const storage = multer.diskStorage({
+var storage = multer.diskStorage({
     destination: function(req, file, cb) {
         const isValid = FILE_TYPE_MAP[file.mimetype];
         let uploadError = new Error('Invalid image type');
@@ -24,21 +23,16 @@ const storage = multer.diskStorage({
         cb(uploadError, 'public/uploads');
     },
     filename: function(req, file, cb) {
-        const fileName = file.originalname.toLowerCase().split(' ').join('-');
+        const fileName = file.name.toLowerCase().split(' ').join('-');
         const extension = FILE_TYPE_MAP[file.mimetype];
         cb(null, `${fileName}-${Date.now()}.${extension}`);
     }
 });
 
-const uploadOptions = multer({storage: storage});
+var uploadOptions = multer({storage: storage});
 
 router.get(`/`,async (req, res) => {
-    let filter = {};
-    if(req.query.specialities){
-
-        filter = {speciality: req.query.specialities.split(',')}
-    }
-    const doctorList = await Doctor.find(filter).select('name profilePicture phone email speciality');
+    let doctorList = await Doctor.find().select('name profilePicture phone email price');
 
     if(!doctorList) {
         res.status(500).json({success: false})
@@ -47,44 +41,29 @@ router.get(`/`,async (req, res) => {
 });
 
 router.get(`/:id`, async (req, res) => {
-    const doctor = await Doctor.findById(req.params.id).populate('speciality').select('name profilePicture phone email speciality');
+    let doctor = await Doctor.findById(req.params.id).populate().select();
     if(!doctor) {
         res.status(500).json({success: false})
     }
     res.status(200).send(doctor);
 });
 
-router.post(`/`, uploadOptions.single('profilePicture') , async (req, res) => {
-   
-    const file = req.file;
-    if(!file) return res.status(400).send('No image in the request');
-
-    const fileName = req.file.filename;
-    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
-
-    const doctor = new Doctor({
-        name: req.body.name,
-        email: req.body.email,
-        passwordHash: bcrypt.hashSync(req.body.password, 10),
-        phone: req.body.phone,
-        medicalLicenseNumber: req.body.medicalLicenseNumber,
-    });
-
-    doctor = await doctor.save();
-    if(!doctor)
-    return res.status(500).send('the doctor cannot be created!');
-
-    res.send(doctor);
-});
-
 router.post(`/register`, async (req, res) => {
+
+    // let file = req.file;
+    // if(!file) return res.status(400).send('No image in the request');
+
+    // let fileName = req.file.filename;
+    // let basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
    
-    const doctor = new Doctor({
+    let doctor = new Doctor({
         name: req.body.name,
         email: req.body.email,
         passwordHash: bcrypt.hashSync(req.body.password, 10),
         phone: req.body.phone,
-        medicalLicenseNumber: req.body.medicalLicenseNumber,
+        bio: req.body.bio,
+        price: req.body.price,
+        //profilePicture: `${basePath}${fileName}`,
     });
 
     doctor = await doctor.save();
@@ -100,21 +79,15 @@ router.put(`/:id`, async (req, res) => {
         res.status(400).send('Invalid Doctor Id');
     }
 
-    const speciality = await Speciality.findById(req.body.speciality);
-    if(!speciality) return res.status(400).send('Invalid Speciality');
-
-    const doctor = await Doctor.findByIdAndUpdate(
+    let doctor = await Doctor.findByIdAndUpdate(
         req.params.id,
         {
             name: req.body.name,
             email: req.body.email,
             phone: req.body.phone,
-            speciality: req.body.speciality,
-            medicalLicenseNumber: req.body.medicalLicenseNumber,
             bio: req.body.bio,
-            profilePicture: req.body.profilePicture,
+            //profilePicture: req.body.profilePicture,
             price: req.body.price,
-            isVerified: req.body.isVerified
         },
         { new: true }
     )
@@ -126,8 +99,8 @@ router.put(`/:id`, async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-    const doctor = await Doctor.findOne({email: req.body.email});
-    const secret = process.env.secret;
+    let doctor = await Doctor.findOne({email: req.body.email});
+    let secret = process.env.secret;
     if(!doctor) {
         return res.status(400).send('The doctor not found');
     }
@@ -148,7 +121,7 @@ router.post('/login', async (req, res) => {
 });
 
 router.get(`/get/count`,async (req, res) => {
-    const doctorCount = await Doctor.countDocuments((count) => count);
+    let doctorCount = await Doctor.countDocuments((count) => count);
 
     if(!doctorCount) {
         res.status(500).json({success: false})
