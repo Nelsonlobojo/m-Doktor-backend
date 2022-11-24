@@ -14,7 +14,6 @@ function authJwt () {
             `${api}/doctors/`,
             `${api}/doctors/register`,
             `${api}/doctors/login`,
-            `${api}/appointments/`,
             `${api}/users/`,
 
         ]

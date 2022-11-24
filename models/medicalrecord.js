@@ -6,6 +6,16 @@ const medicalRecordSchema = mongoose.Schema({
         ref: 'Appointment',
         required: true
     },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    doctor: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Doctor',
+        required: true
+    },
     diagnosis: {
         type: String,
         required:true,
@@ -20,7 +30,11 @@ const medicalRecordSchema = mongoose.Schema({
         type: String,
         minlength:3,
         required:true
-    }
+    },
+    date: {
+        type: Date,
+        required: true,
+    },
 });
 
 module.exports = mongoose.model('MedicalRecord', medicalRecordSchema);

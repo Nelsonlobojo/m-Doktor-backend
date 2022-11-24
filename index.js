@@ -14,10 +14,6 @@ const doctorRouter = require('./routers/doctor');
 const userRouter = require('./routers/user');
 const appointmentRouter = require('./routers/appointment');
 const medicalRecordRouter = require('./routers/medicalRecord');
-const newsItemRouter = require('./routers/newsItem');
-const offlineCallRouter = require('./routers/offlineCall');
-const reviewRouter = require('./routers/review');
-const chatRouter = require('./routers/chat'); 
 const authJwt = require('./helpers/jwt');
 const errorHandler = require('./helpers/error-handler'); 
 
@@ -33,11 +29,7 @@ app.use(errorHandler);
 app.use(`${api}/doctors`, doctorRouter);
 app.use(`${api}/users`, userRouter);
 app.use(`${api}/appointments`, appointmentRouter);
-/*app.use(`${api}/medicalRecords`, medicalRecordRouter);
-app.use(`${api}/newsItems`, newsItemRouter);
-app.use(`${api}/offlineCalls`, offlineCallRouter);
-app.use(`${api}/reviews`, reviewRouter);
-app.use(`${api}/chats`, chatRouter); */
+app.use(`${api}/records`, medicalRecordRouter);
 
 
  //Database connection
@@ -48,10 +40,14 @@ mongoose.connect( process.env.DB_CONNECT, {
     .then(() => console.log('Connected to database'))
     .catch((err) => console.log(err)); 
 
+
+
 // // Server - development
 app.listen(3000, () => {
     console.log('Server is running http://localhost:3000');
 });
+
+
 
 // // Server - production
 // var server = app.listen(process.env.PORT || 3000, function () {
